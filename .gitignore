@@ -1,0 +1,10 @@
+__pycache__/
+*.py[cod]
+.ruff_cache/
+build/
+dist/
+*.spec
+*.log
+docs/gui.pid
+.env
+.DS_Store
