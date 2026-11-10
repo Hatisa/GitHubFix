@@ -13,7 +13,7 @@ from .models import DOMAIN_BY_HOST, ProbeResult
 
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) GitHubFix/1.0"
 # 限制全局并发，避免短时间内向 GitHub 发起过多连接反而触发限速。
-_PROBE_SEMAPHORE = threading.Semaphore(8)
+_PROBE_SEMAPHORE = threading.Semaphore(5)
 
 
 def _http_status(sock: socket.socket, host: str, path: str) -> tuple[int | None, str]:
@@ -255,7 +255,7 @@ def probe_domains(
     progress: Callable[[str], None] | None = None,
 ) -> dict[str, list[ProbeResult]]:
     output: dict[str, list[ProbeResult]] = {}
-    with ThreadPoolExecutor(max_workers=min(5, len(candidates_by_host) or 1)) as pool:
+    with ThreadPoolExecutor(max_workers=min(4, len(candidates_by_host) or 1)) as pool:
         futures = {
             pool.submit(
                 probe_candidates,

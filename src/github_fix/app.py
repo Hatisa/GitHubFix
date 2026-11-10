@@ -596,6 +596,8 @@ class GitHubFixApp:
         self._log(proxy_message, "ok" if proxy_ok else "warn")
         self._refresh_proxy_status()
         lines = [outcome.message]
+        if getattr(outcome, "detail", None):
+            lines.append("\n".join(outcome.detail))
         lines.append(proxy_message)
         risky = (report.git or {}).get("risky_rewrites") or []
         if outcome.applied and proxy_ok:
@@ -607,7 +609,7 @@ class GitHubFixApp:
         elif outcome.applied:
             lines.append("hosts 已生效，但智能代理未启动。仍可尝试直接访问或 SSH 443。")
         elif proxy_ok:
-            lines.append("hosts 未写入（可用 IP 不足或验证失败），但本地智能连接器已启动，可先用于 Git HTTPS。")
+            lines.append("hosts 未写入，但本地智能连接器已启动，可先用于 Git HTTPS。")
         else:
             lines.append("hosts 与智能代理均未成功。请改用 SSH 443 或你所在组织允许的合法代理。")
         messagebox.showinfo("智能加速结果", "\n\n".join(lines), parent=self.root)
@@ -633,7 +635,10 @@ class GitHubFixApp:
         report, outcome = result
         self._apply_report(report)
         self._log(outcome.message, "ok" if outcome.applied else "err")
-        messagebox.showinfo("Hosts 优化结果", outcome.message, parent=self.root)
+        body = outcome.message
+        if getattr(outcome, "detail", None):
+            body += "\n\n逐个域名结果:\n" + "\n".join(outcome.detail)
+        messagebox.showinfo("Hosts 优化结果", body, parent=self.root)
 
     def _toggle_proxy(self) -> None:
         status = self.controller.status()

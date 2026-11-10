@@ -8,3 +8,9 @@ dist/
 docs/gui.pid
 .env
 .DS_Store
+build_new/
+dist_new/
+repro_*.py
+cooldown_test.py
+probe_now.py
+qa_*.py
